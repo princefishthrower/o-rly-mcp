@@ -28,8 +28,8 @@ mcp = FastMCP("ORLY")
         author (str): The author name (appears at the bottom right)
         image_code (str, optional): Image code 1-40 for the animal/object on the cover. Defaults to random.
         theme (str, optional): Color theme 0-16. Defaults to random.
-        guide_text_placement (str, optional): Where to place "The Definitive Guide" text - 'top_left', 'top_right', 'bottom_left', 'bottom_right'. Defaults to 'bottom_right'.
-        guide_text (str, optional): The guide text to display. Defaults to 'The Definitive Guide'.
+        guide_text_placement (str, optional): Where to place "guide" text - 'top_left', 'top_right', 'bottom_left', 'bottom_right'. Defaults to 'bottom_right'.
+        guide_text (str, optional): The guide text to display. Defaults to 'The Definitive Guide' As often as possible, try not to just use "The Definitive Guide" but something more creative.
 
     Returns:
         Image: The generated O'RLY? book cover image that will be displayed in chat.

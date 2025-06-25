@@ -1,4 +1,8 @@
-# o-rly-mcp
+# orly-mcp
+
+[![PyPI version](https://img.shields.io/pypi/v/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
+[![Python versions](https://img.shields.io/pypi/pyversions/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
+[![Downloads](https://img.shields.io/pypi/dm/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
 
 An MCP (Model Context Protocol) server for generating O'RLY? (O'Reilly parody) book covers that display directly in Claude Desktop application.
 
@@ -8,13 +12,15 @@ An MCP (Model Context Protocol) server for generating O'RLY? (O'Reilly parody) b
 
 simply add the following to your mcp configuration:
 
-```shell
+```json
+// ... other MCP servers ...
 "mcp-orly": {
     "command": "uvx",
     "args": [
-        "orly-mcp"
+        "orly-mcp@latest"
     ]
 }
+// ... other MCP servers ...
 ```
 
 ### Local Development
@@ -22,7 +28,7 @@ simply add the following to your mcp configuration:
 ```shell
 # Clone the repository
 git clone [your-repo-url]
-cd o-rly-mcp
+cd orly-mcp
 
 # Create a virtual environment and install dependencies
 uv venv .venv
@@ -56,15 +62,15 @@ Add this MCP server to your Claude Desktop configuration file (`claude_desktop_c
         "--with", "fonttools",
         "--with", "requests",
         "python",
-        "/path/to/your/o-rly-mcp/orly_mcp/server.py"
+        "/path/to/your/orly-mcp/orly_mcp/server.py"
       ],
-      "cwd": "/path/to/your/o-rly-mcp"
+      "cwd": "/path/to/your/orly-mcp"
     }
   }
 }
 ```
 
-**Important:** Replace `/path/to/your/o-rly-mcp` with your actual project path.
+**Important:** Replace `/path/to/your/orly-mcp` with your actual project path.
 
 ### Alternative: Package Installation
 
@@ -77,7 +83,7 @@ uv pip install -e .
   "mcpServers": {
     "orly-local": {
       "command": "uvx",
-      "args": ["--from", "/your/path/to/o-rly-mcp", "orly-mcp"]
+      "args": ["--from", "/your/path/to/orly-mcp", "orly-mcp"]
     }
   }
 }
@@ -90,7 +96,7 @@ uv pip install -e .
 If you see this error, the MCP dependencies aren't available:
 
 ```shell
-cd /path/to/your/o-rly-mcp
+cd /path/to/your/orly-mcp
 uv pip install -r requirements.txt
 ```
 
@@ -147,4 +153,4 @@ The original O'RLY book cover generation code in the `orly_generator/` directory
 
 ## Acknowledgments
 
-This project builds upon the excellent work by Charles Berlin. The core image generation code in the `orly_generator/` directory is adapted from his original [o-rly-mcp](https://github.com/charleshberlin/o-rly-mcp) repository, updated to work with Python 3 and integrated into an MCP server for Claude Desktop.
+This project builds upon the excellent work by Charles Berlin. The core image generation code in the `orly_generator/` directory is adapted from his original [orly-mcp](https://github.com/charleshberlin/orly-mcp) repository, updated to work with Python 3 and integrated into an MCP server for Claude Desktop.

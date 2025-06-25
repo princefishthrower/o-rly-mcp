@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "orly-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "An MCP server for the ORLY tool."
 authors = [
     {name = "Chris Frewin", email = "hi@fullstackcraft.com"},
@@ -45,9 +45,9 @@ include = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/princefishthrower/o-rly-mcp"
-"Bug Tracker" = "https://github.com/princefishthrower/o-rly-mcp/issues"
-"Repository" = "https://github.com/princefishthrower/o-rly-mcp"
+"Homepage" = "https://github.com/princefishthrower/orly-mcp"
+"Bug Tracker" = "https://github.com/princefishthrower/orly-mcp/issues"
+"Repository" = "https://github.com/princefishthrower/orly-mcp"
 
 [dependency-groups]
 dev = [
