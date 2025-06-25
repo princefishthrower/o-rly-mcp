@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "orly-mcp"
+version = "0.1.0"
+description = "An MCP server for the ORLY tool."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License", # Or your preferred license
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "fastmcp",
+]
+
+[project.scripts]
+orly-mcp = "orly_mcp.server:main"
+
+[project.urls]
+"Homepage" = "https://github.com/example/orly-mcp" # Replace with your actual URL
+"Bug Tracker" = "https://github.com/example/orly-mcp/issues" # Replace with your actual URL
