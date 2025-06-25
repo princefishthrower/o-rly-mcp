@@ -4,8 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "orly-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "An MCP server for the ORLY tool."
+authors = [
+    {name = "Chris Frewin", email = "hi@fullstackcraft.com"},
+]
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
@@ -23,6 +26,31 @@ dependencies = [
 [project.scripts]
 orly-mcp = "orly_mcp.server:main"
 
+[tool.hatch.build.targets.wheel]
+packages = ["orly_mcp", "orly_generator"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"fonts" = "fonts"
+"images" = "images"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/orly_mcp",
+    "/orly_generator", 
+    "/fonts",
+    "/images",
+    "/README.md",
+    "/LICENSE.txt",
+    "/pyproject.toml"
+]
+
 [project.urls]
-"Homepage" = "https://github.com/example/orly-mcp" # Replace with your actual URL
-"Bug Tracker" = "https://github.com/example/orly-mcp/issues" # Replace with your actual URL
+"Homepage" = "https://github.com/princefishthrower/o-rly-mcp"
+"Bug Tracker" = "https://github.com/princefishthrower/o-rly-mcp/issues"
+"Repository" = "https://github.com/princefishthrower/o-rly-mcp"
+
+[dependency-groups]
+dev = [
+    "build>=1.2.2.post1",
+    "twine>=6.1.0",
+]

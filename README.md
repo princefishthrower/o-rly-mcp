@@ -2,15 +2,24 @@
 
 An MCP (Model Context Protocol) server for generating O'RLY? (O'Reilly parody) book covers that display directly in Claude Desktop application.
 
-## Overview
-
-This MCP server generates parody book covers in the style of O'Reilly books with custom titles, subtitles, authors, and styling options. The generated images are displayed directly in your Claude Desktop chat.
-
 ## Quick Start
 
-### Installation
+### Install on MCP Server
 
-```bash
+simply add the following to your mcp configuration:
+
+```shell
+"mcp-orly": {
+    "command": "uvx",
+    "args": [
+        "orly-mcp"
+    ]
+}
+```
+
+### Local Development
+
+```shell
 # Clone the repository
 git clone [your-repo-url]
 cd o-rly-mcp
@@ -18,11 +27,7 @@ cd o-rly-mcp
 # Create a virtual environment and install dependencies
 uv venv .venv
 uv pip install -r requirements.txt
-```
 
-### Local Development
-
-```bash
 # Test a sample image generation
 uv run python test_mcp.py
 
@@ -63,7 +68,7 @@ Add this MCP server to your Claude Desktop configuration file (`claude_desktop_c
 
 ### Alternative: Package Installation
 
-```bash
+```shell
 # Install in editable mode
 uv pip install -e .
 
@@ -84,7 +89,7 @@ uv pip install -e .
 
 If you see this error, the MCP dependencies aren't available:
 
-```bash
+```shell
 cd /path/to/your/o-rly-mcp
 uv pip install -r requirements.txt
 ```
@@ -111,7 +116,7 @@ Ensure all dependencies are specified in your Claude Desktop configuration:
 
 Run the comprehensive test to verify everything works:
 
-```bash
+```shell
 uv run python test_comprehensive.py
 ```
 
