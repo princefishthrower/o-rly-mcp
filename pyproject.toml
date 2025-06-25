@@ -15,6 +15,7 @@ classifiers = [
 ]
 dependencies = [
     "fastmcp",
+    "o-rly-book-generator",
 ]
 
 [project.scripts]
