@@ -22,7 +22,7 @@ def test_claude_desktop_command():
         "--with", "fonttools",
         "--with", "requests",
         "python", "-c",
-        "from slack.models import generate_image; print('✅ All imports successful')"
+        "from orly_generator.models import generate_image; print('✅ All imports successful')"
     ]
     
     try:

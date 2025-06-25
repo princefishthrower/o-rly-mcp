@@ -9,9 +9,9 @@ import os
 import tempfile
 import json
 
-# Add the parent directory to the path to import from slack.models
+# Add the parent directory to the path to import from orly_generator.models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from slack.models import generate_image
+from orly_generator.models import generate_image
 
 # Initialize FastMCP server
 mcp = FastMCP("ORLY")
@@ -51,6 +51,9 @@ def generate_orly_cover(
         # Set defaults if not provided
         if image_code is None:
             import random
+            import time
+            # Seed the random number generator with current time to improve randomness
+            random.seed(time.time())
             image_code = str(random.randrange(1, 41))
         else:
             # Validate image_code is in range 1-40

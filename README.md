@@ -1,142 +1,56 @@
-# O-RLY-Book-Generator
+# O-RLY-Book-Generator MCP Server
 
-Python tool for generating O RLY? Book Covers
+An MCP (Model Context Protocol) server for generating O'RLY? book covers that display directly in Claude Desktop.
 
-## Local Development
+## Overview
 
-First create a virtual environment:
+This MCP server generates parody book covers in the style of O'Reilly books with custom titles, subtitles, authors, and styling options. The generated images are displayed directly in your Claude Desktop chat.
 
-```bash
-uv venv .venv
-```
-
-Install the required dependencies:
-
-```bash
-uv pip install -r requirements.txt
-```
-
-**For MCP server development, you can also install in editable mode:**
-
-```bash
-uv pip install -e .
-```
-
-Test a sample image:
-
-```bash
-uv run python main.py
-```
-
-You should see a `.png` generated within the `slack` directory where the filename is the datetime of generation.
-
-## MCP Server Local Development
-
-To run the MCP server locally for development, you have two options:
-
-### Option 1: Using the helper script (recommended)
-```shell
-cd /path/to/your/local/clone/O-RLY-Book-Generator
-python start_server.py
-```
-
-### Option 2: Direct command
-```shell
-cd /path/to/your/local/clone/O-RLY-Book-Generator
-uv run python orly_mcp/server.py
-```
-
-The server will start and listen for MCP requests. You should see "Starting ORLY MCP server..." when it's running.
-
-### Testing the MCP Server
-
-You can test the server functionality with:
-
-```shell
-# Basic functionality test
-uv run python test_mcp.py
-
-# Comprehensive image conversion test
-uv run python test_image_conversion.py
-
-# Input validation test
-uv run python test_validation.py
-
-# Comprehensive setup test (recommended)
-uv run python test_comprehensive.py
-```
-
-
-## ORLY MCP Server
-
-This project includes an MCP (Model Context Protocol) server that allows ORLY to be used as a tool by other systems, such as Claude Desktop. The generated book cover images are displayed directly in the chat interface!
+## Quick Start
 
 ### Installation
 
-To install the ORLY MCP server and its dependencies, you can use `uv` (or `pip`). From the root of this repository:
-
 ```bash
-uv pip install .
-```
+# Clone the repository
+git clone [your-repo-url]
+cd O-RLY-Book-Generator
 
-Alternatively, if you are developing the tool, you can install it in editable mode:
-
-```bash
-uv pip install -e .
-```
-
-### Running the Server
-
-Once installed, you can run the MCP server using `uvx` (or directly if your environment is set up):
-
-```bash
-uvx orly-mcp
-```
-
-This will start the server, and it will listen for requests.
-
-### Claude Desktop Configuration for Local Development
-
-For local development, you have two options:
-
-#### Option 1: Using the installed package approach (Recommended)
-
-First, install the package in editable mode:
-```bash
-cd /Users/chris/enterprise/O-RLY-Book-Generator
-uv pip install -e .
-```
-
-Then configure Claude Desktop:
-```json
-{
-  "mcpServers": {
-    "orly-local": {
-      "command": "uvx",
-      "args": ["--from", "/Users/chris/enterprise/O-RLY-Book-Generator", "orly-mcp"]
-    }
-  }
-}
-```
-
-#### Option 2: Direct script execution
-
-Make sure dependencies are installed first:
-```bash
-cd /Users/chris/enterprise/O-RLY-Book-Generator
+# Create a virtual environment and install dependencies
+uv venv .venv
 uv pip install -r requirements.txt
 ```
 
-Then configure Claude Desktop:
+### Local Development
+
+```bash
+# Test a sample image generation
+uv run python test_mcp.py
+
+# Run comprehensive tests
+uv run python test_comprehensive.py
+
+# Start the MCP server for development
+python start_server.py
+```
+
+## Claude Desktop Configuration
+
+Add this MCP server to your Claude Desktop configuration file (`claude_desktop_config.json`):
+
+### Recommended Configuration
+
 ```json
 {
   "mcpServers": {
     "orly-local": {
       "command": "uv",
       "args": [
-        "run", 
+        "run",
         "--with", "fastmcp",
-        "python", 
+        "--with", "pillow",
+        "--with", "fonttools",
+        "--with", "requests",
+        "python",
         "/Users/chris/enterprise/O-RLY-Book-Generator/orly_mcp/server.py"
       ],
       "cwd": "/Users/chris/enterprise/O-RLY-Book-Generator"
@@ -145,59 +59,60 @@ Then configure Claude Desktop:
 }
 ```
 
-**Note:** Replace `/Users/chris/enterprise/O-RLY-Book-Generator` with the actual absolute path to your O-RLY-Book-Generator directory.
+**Important:** Replace `/Users/chris/enterprise/O-RLY-Book-Generator` with your actual project path.
+
+### Alternative: Package Installation
+
+```bash
+# Install in editable mode
+uv pip install -e .
+
+# Claude Desktop config
+{
+  "mcpServers": {
+    "orly-local": {
+      "command": "uvx",
+      "args": ["--from", "/your/path/to/O-RLY-Book-Generator", "orly-mcp"]
+    }
+  }
+}
+```
 
 ## Troubleshooting
 
 ### "ModuleNotFoundError: No module named 'mcp'" Error
 
-If you see this error when Claude Desktop tries to run the MCP server, it means the MCP dependencies aren't available. Here are the solutions:
+If you see this error, the MCP dependencies aren't available:
 
-1. **Ensure dependencies are installed:**
-   ```bash
-   cd /path/to/your/O-RLY-Book-Generator
-   uv pip install -r requirements.txt
-   ```
+```bash
+cd /path/to/your/O-RLY-Book-Generator
+uv pip install -r requirements.txt
+```
 
-2. **Use Option 1 from the Claude Desktop configuration above** (recommended) - install the package in editable mode and use `uvx`
+Make sure your Claude Desktop configuration includes all required dependencies with `--with` flags.
 
-3. **For Option 2**, make sure your Claude Desktop configuration includes `--with fastmcp`:
-   ```json
-   {
-     "mcpServers": {
-       "orly-local": {
-         "command": "uv",
-         "args": [
-           "run", 
-           "--with", "fastmcp",
-           "python", 
-           "/your/path/to/O-RLY-Book-Generator/orly_mcp/server.py"
-         ],
-         "cwd": "/your/path/to/O-RLY-Book-Generator"
-       }
-     }
-   }
-   ```
+### "ModuleNotFoundError: No module named 'fontTools'" Error
 
-### Flask Import Errors
-
-The MCP server is designed to work independently of Flask. If you encounter Flask-related import errors, this should be automatically resolved as the code has been updated to import only the necessary modules without going through Flask dependencies.
-
-### Example Claude Desktop Configuration for Installed Package
-
-You can add this server to your Claude Desktop configuration like so:
+Ensure all dependencies are specified in your Claude Desktop configuration:
 
 ```json
-{
-  "mcpServers": {
-    "mcp-orly": {
-      "command": "uvx",
-      "args": [
-        "orly-mcp"
-      ]
-    }
-  }
-}
+"args": [
+  "run",
+  "--with", "fastmcp",
+  "--with", "pillow",
+  "--with", "fonttools", 
+  "--with", "requests",
+  "python",
+  "/your/path/to/orly_mcp/server.py"
+]
+```
+
+### Testing Your Setup
+
+Run the comprehensive test to verify everything works:
+
+```bash
+uv run python test_comprehensive.py
 ```
 
 ### Using the ORLY Tool in Claude
@@ -218,3 +133,13 @@ The tool supports these parameters:
 - **theme** (optional): Color theme 0-16 (random if not specified)  
 - **guide_text_placement** (optional): Position of guide text - 'top_left', 'top_right', 'bottom_left', 'bottom_right'
 - **guide_text** (optional): Custom guide text (defaults to "The Definitive Guide")
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+The original O'RLY book cover generation code in the `orly_generator/` directory is based on work by Charles Berlin (2016) and is also licensed under the MIT License - see [orly_generator/LICENSE.txt](orly_generator/LICENSE.txt) for details.
+
+## Acknowledgments
+
+This project builds upon the excellent work by Charles Berlin. The core image generation code in the `orly_generator/` directory is adapted from his original [O-RLY-Book-Generator](https://github.com/charleshberlin/O-RLY-Book-Generator) repository, updated to work with Python 3 and integrated into an MCP server for Claude Desktop.

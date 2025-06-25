@@ -2,7 +2,7 @@
 .venv/
 
 # book image artifacts
-slack/*.png
+orly_generator/*.png
 
 # pycache
 __pycache__/

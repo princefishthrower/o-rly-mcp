@@ -1,8 +1,7 @@
 import json, os, re, requests, random
-from urllib.parse import unquote_plus, quote
 from PIL import Image, ImageDraw, ImageFont
-import shutil, urllib, os, sys, datetime, requests, json
-from slack.cache import get, set, clear  # Import cache functions directly
+import datetime
+from orly_generator.cache import get, set, clear  # Import cache functions directly
 from fontTools.ttLib import TTFont
 
 def get_text_size(draw, text, font, multiline=False):
@@ -22,35 +21,6 @@ def get_text_size(draw, text, font, multiline=False):
     else:
         bbox = draw.textbbox((0, 0), text, font=font)
         return bbox[2] - bbox[0], bbox[3] - bbox[1]
-
-def parse_text_into_params(text):
-    text = unquote_plus(text).strip()
-    text = text[:-1] if text[-1] == ";" else text
-
-    params = text.split(";")
-
-    title = params[0].strip()
-    del params[0]
-
-    subtitle = params[0].strip()
-    del params[0]
-
-    author = params[0].strip()
-    del params[0]
-
-    if len(params) > 0:
-        image_code = params[0].strip()
-        del params[0]
-    else:
-        image_code = str(random.randrange(1,41))
-
-    if len(params) > 0:
-        theme = params[0].strip()
-        del params[0]
-    else:
-        theme = str(random.randrange(0,17))
-    return title, subtitle, author, image_code, theme
-
 
 def generate_image(title, topText, author, image_code, theme, guide_text_placement='bottom_right', guide_text='The Definitive Guide'):
     cache_string = title + "_" + topText + "_" + author + "_" + image_code + "_" + theme + "_" + guide_text_placement + "_" + guide_text
