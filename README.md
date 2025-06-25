@@ -2,7 +2,6 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
 [![Python versions](https://img.shields.io/pypi/pyversions/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
-[![Downloads](https://img.shields.io/pypi/dm/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
 
 An MCP (Model Context Protocol) server for generating O'RLY? (O'Reilly parody) book covers that display directly in Claude Desktop application.
 
