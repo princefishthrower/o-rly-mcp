@@ -1,0 +1,8 @@
+# virtual environment
+.venv/
+
+# book image artifacts
+slack/*.png
+
+# pycache
+__pycache__/

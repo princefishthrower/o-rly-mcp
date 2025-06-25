@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, url_for, send_from_directory, redirect, send_file, jsonify
-from models import parse_text_into_params, save_team_token, get_team_token, save_team_bot, get_team_bot, generate_image
-from slacker import *
+from slack.models import parse_text_into_params, generate_image
 import shutil, urllib, os, sys, datetime, requests, json, random, datetime
-from slack import app
+from slack import create_app
+
+app = create_app()
 
 @app.route('/authorize')
 def authorize():
@@ -21,7 +22,7 @@ def authorize():
         res = requests.post('https://slack.com/api/oauth.access', data=oauthDict)
         json_response = res.json()
 
-        print json_response
+        print(json_response)
 
         team_id = json_response['team_id']
         token = json_response['access_token']
@@ -35,12 +36,12 @@ def authorize():
 
         return redirect('http://dev.to/rlyslack', code=302)
     except Exception as e:
-        print "Unexpected error:", e.message
+        print("Unexpected error:", e.message)
         return "Failed:", 500
 
 @app.route("/orly", methods=['POST'])
 def orly():
-    print request.form
+    print(request.form)
     if not request.form:
         message = """
         Bad Request, Try Again
@@ -63,16 +64,16 @@ def orly():
             return "Unauthorized."
         title, topText, author, image_code, theme = parse_text_into_params(text)
     except Exception as e:
-        print "Unexpected error:", e.message
+        print("Unexpected error:", e.message)
         return "Failed: Invalid Parameters", 500
 
-    print "generating image"
+    print("generating image")
     try:
         final_path = generate_image(title, topText, author, image_code, theme)
     except Exception as e:
-        print "Unexpected error:", e.message
+        print("Unexpected error:", e.message)
         return "Failed", 500
-    print "image generated"
+    print("image generated")
 
     try:
         file_name = '%s.png'%datetime.datetime.now()
@@ -86,7 +87,7 @@ def orly():
             if is_private_channel:
                 response = bot.groups.list()
                 groups = response.body['groups']
-                print groups
+                print(groups)
                 invited = False
                 if groups is not None:
                     for group in groups:
@@ -101,14 +102,14 @@ def orly():
             response = slack.files.upload(final_path, filename=file_name, title=file_title, channels=[channel_id])
 
         if response.successful:
-            print "Succesfully uploaded file"
+            print("Succesfully uploaded file")
             return "Success", 200
         else:
-            print "Error uploading file"
-            print response.error
+            print("Error uploading file")
+            print(response.error)
             return "Failed: Error uploading file", 500
     except Exception as e:
-        print "Unexpected error:", e.message
+        print("Unexpected error:", e.message)
         return "Failed", 500
     finally:
         os.remove(final_path)
@@ -124,9 +125,9 @@ def generate():
         return message, 401
 
     try:
-        print 'generate image'
+        print('generate image')
         body = request.args
-        print body
+        print(body)
         if 'title' in body and 'top_text' in body and 'author' in body and 'image_code' in body and 'theme' in body:
             title = body['title']
             top_text = body['top_text']
@@ -147,18 +148,18 @@ def generate():
             return "Failed: Invalid Params", 401
 
     except Exception as e:
-        print "Unexpected error:", e.message
+        print("Unexpected error:", e.message)
         return "Unexpected Error", 500
 
     try:
-        print "generating image"
+        print("generating image")
         final_path = generate_image(title, top_text, author, image_code, theme, guide_text_placement=guide_text_placement, guide_text=guide_text)
-        print "image generated"
+        print("image generated")
         return send_file(final_path, mimetype='image/png', cache_timeout=604800)#604800 is one week in seconds
     except Exception as e:
-        print "Unexpected error:", e.message
+        print("Unexpected error:", e.message)
         return "Failed", 500
     finally:
         if os.path.isfile(final_path):
-            print 'removing file'
+            print('removing file')
             os.remove(final_path)

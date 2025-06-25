@@ -1,8 +1,13 @@
-from flask import Flask
-from flask.ext.cacheify import init_cacheify
 import os
 
-app = Flask(__name__)
+# Only import Flask and create app when needed (for web server)
+app = None
 
-cache = init_cacheify(app)
-from slack import views
+def create_app():
+    """Create Flask app only when needed for web server"""
+    global app
+    if app is None:
+        from flask import Flask
+        app = Flask(__name__)
+        from slack import views
+    return app

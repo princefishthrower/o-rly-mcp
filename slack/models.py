@@ -1,9 +1,27 @@
-import json, os, re, psycopg2, requests, random
-from urllib import unquote_plus, quote
+import json, os, re, requests, random
+from urllib.parse import unquote_plus, quote
 from PIL import Image, ImageDraw, ImageFont
 import shutil, urllib, os, sys, datetime, requests, json
-from slack import cache
+from slack.cache import get, set, clear  # Import cache functions directly
 from fontTools.ttLib import TTFont
+
+def get_text_size(draw, text, font, multiline=False):
+    """Helper function to get text size compatible with both old and new Pillow versions"""
+    if multiline:
+        # For multiline text, we need to handle it differently
+        lines = text.split('\n')
+        total_width = 0
+        total_height = 0
+        for line in lines:
+            bbox = draw.textbbox((0, 0), line, font=font)
+            line_width = bbox[2] - bbox[0]
+            line_height = bbox[3] - bbox[1]
+            total_width = max(total_width, line_width)
+            total_height += line_height
+        return total_width, total_height
+    else:
+        bbox = draw.textbbox((0, 0), text, font=font)
+        return bbox[2] - bbox[0], bbox[3] - bbox[1]
 
 def parse_text_into_params(text):
     text = unquote_plus(text).strip()
@@ -37,9 +55,9 @@ def parse_text_into_params(text):
 def generate_image(title, topText, author, image_code, theme, guide_text_placement='bottom_right', guide_text='The Definitive Guide'):
     cache_string = title + "_" + topText + "_" + author + "_" + image_code + "_" + theme + "_" + guide_text_placement + "_" + guide_text
 
-    cached = cache.get(cache_string)
+    cached = get(cache_string)
     if cached:
-        print "Cache hit"
+        print("Cache hit")
         try:
             final_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), ('%s.png'%datetime.datetime.now())))
             width = 500
@@ -49,9 +67,9 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
             im.close()
             return final_path
         except Exception as e:
-            print e.message
+            print(str(e))
     else:
-        print "Cache miss"
+        print("Cache miss")
 
     themeColors = {
         "0" : (85,19,93,255),
@@ -94,13 +112,13 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
     dr.rectangle(((20,0),(width-20,10)), fill=themeColor)
 
     topText = sanitzie_unicode(topText, font_path_italic)
-    textWidth, textHeight = dr.textsize(topText, topFont)
+    textWidth, textHeight = get_text_size(dr, topText, topFont)
     textPositionX = (width/2) - (textWidth/2)
 
     dr.text((textPositionX,10), topText, fill='black', font=topFont)
 
     author = sanitzie_unicode(author, font_path_italic)
-    textWidth, textHeight = dr.textsize(author, authorFont)
+    textWidth, textHeight = get_text_size(dr, author, authorFont)
     textPositionX = width - textWidth - 20
     textPositionY = height - textHeight - 20
 
@@ -108,7 +126,7 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
 
     oreillyText = "O RLY"
 
-    textWidth, textHeight = dr.textsize(oreillyText, oriellyFont)
+    textWidth, textHeight = get_text_size(dr, oreillyText, oriellyFont)
     textPositionX = 20
     textPositionY = height - textHeight - 20
 
@@ -124,26 +142,26 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
     if newTitle == None:
         raise ValueError('Title too long')
 
-    textWidth, textHeight = dr.multiline_textsize(newTitle, titleFont)
+    textWidth, textHeight = get_text_size(dr, newTitle, titleFont, multiline=True)
     dr.rectangle([(20,400),(width-20,400 + textHeight + 40)], fill=themeColor)
 
     subtitle = sanitzie_unicode(guide_text, font_path_italic)
 
     if guide_text_placement == 'top_left':
-        textWidth, textHeight = dr.textsize(subtitle, subtitleFont)
+        textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
         textPositionX = 20
         textPositionY = 400 - textHeight - 2
     elif guide_text_placement == 'top_right':
-        textWidth, textHeight = dr.textsize(subtitle, subtitleFont)
+        textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
         textPositionX = width - 20 - textWidth
         textPositionY = 400 - textHeight - 2
     elif guide_text_placement == 'bottom_left':
         textPositionY = 400 + textHeight + 40
-        textWidth, textHeight = dr.textsize(subtitle, subtitleFont)
+        textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
         textPositionX = 20
     else:#bottom_right is default
         textPositionY = 400 + textHeight + 40
-        textWidth, textHeight = dr.textsize(subtitle, subtitleFont)
+        textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
         textPositionX = width - 20 - textWidth
 
     dr.text((textPositionX,textPositionY), subtitle, fill='black', font=subtitleFont)
@@ -159,7 +177,7 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
     final_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), ('%s.png'%datetime.datetime.now())))
     im.save(final_path)
 
-    cache.set(cache_string, im.tobytes())
+    set(cache_string, im.tobytes())
     im.close()
 
     return final_path
@@ -177,7 +195,7 @@ def clamp_title_text(title, width):
 
     for fontSize in range(startFontSize,endFontSize,-1):
         font = ImageFont.truetype(font_path_italic, fontSize)
-        w, h = dr.textsize(title, font)
+        w, h = get_text_size(dr, title, font)
 
         if w < width:
             return font, title
@@ -189,9 +207,9 @@ def clamp_title_text(title, width):
     for fontSize in range(startFontSize,endFontSize,-1):
         font = ImageFont.truetype(font_path_italic, fontSize)
 
-        for match in list(re.finditer('\s',title, re.UNICODE)):
-            newTitle = u''.join((title[:match.start()], u'\n', title[(match.start()+1):]))
-            substringWidth, h = dr.multiline_textsize(newTitle, font)
+        for match in list(re.finditer(r'\s',title, re.UNICODE)):
+            newTitle = ''.join((title[:match.start()], '\n', title[(match.start()+1):]))
+            substringWidth, h = get_text_size(dr, newTitle, font, multiline=True)
 
             if substringWidth < width:
                 return font, newTitle
@@ -201,7 +219,7 @@ def clamp_title_text(title, width):
     return None, None
 
 def sanitzie_unicode(string, font_file_path):
-    sanitized_string = u''
+    sanitized_string = ''
 
     font = TTFont(font_file_path)
     cmap = font['cmap'].getcmap(3,1).cmap
@@ -209,89 +227,6 @@ def sanitzie_unicode(string, font_file_path):
         code_point = ord(char)
 
         if code_point in cmap.keys():
-            sanitized_string = unicode.join(u'',(sanitized_string,char))
+            sanitized_string = ''.join((sanitized_string,char))
 
     return sanitized_string
-
-def save_team_token(team_id, token):
-    DATABASE_NAME = os.environ.get("DATABASE_NAME").strip()
-    DATABASE_USER_NAME = os.environ.get("DATABASE_USER_NAME").strip()
-    DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD").strip()
-    try:
-        conn = psycopg2.connect(database=DATABASE_NAME, user=DATABASE_USER_NAME, password=DATABASE_PASSWORD, host="ec2-54-235-85-65.compute-1.amazonaws.com", port="5432")
-        cur = conn.cursor()
-        TOKENS_TABLE_NAME = os.environ.get("TOKENS_TABLE_NAME").strip()
-        if check_team_token(team_id, cur) == True:
-            statement = "UPDATE %s SET token='%s' WHERE team_id='%s'"%(TOKENS_TABLE_NAME,token,team_id)
-        else:
-            statement = "INSERT INTO %s (team_id,token) VALUES ('%s','%s')"%(TOKENS_TABLE_NAME,team_id, token)
-        print statement
-        cur.execute(statement)
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        print "Unexpected error:", e.message
-        raise e
-
-def get_team_token(team_id):
-    DATABASE_NAME = os.environ.get("DATABASE_NAME").strip()
-    DATABASE_USER_NAME = os.environ.get("DATABASE_USER_NAME").strip()
-    DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD").strip()
-    try:
-        conn = psycopg2.connect(database=DATABASE_NAME, user=DATABASE_USER_NAME, password=DATABASE_PASSWORD, host="ec2-54-235-85-65.compute-1.amazonaws.com", port="5432")
-        cur = conn.cursor()
-        TOKENS_TABLE_NAME = os.environ.get("TOKENS_TABLE_NAME").strip()
-        statement = "SELECT token FROM %s WHERE team_id='%s'"%(TOKENS_TABLE_NAME,team_id)
-        print statement
-        cur.execute(statement)
-        row = cur.fetchone()
-        conn.close()
-        return row[0]
-    except Exception as e:
-        print "Unexpected error:", e.message
-        return None
-
-def check_team_token(team_id, cur):
-    TOKENS_TABLE_NAME = os.environ.get("TOKENS_TABLE_NAME").strip()
-    cur.execute("SELECT team_id FROM %s WHERE team_id = '%s'"%(TOKENS_TABLE_NAME,team_id))
-    return cur.fetchone() is not None
-
-def save_team_bot(team_id, bot_user_id, bot_access_token):
-    try:
-        conn = psycopg2.connect(database="d1gj7v4n22uqdg", user="fihlxuqpdlhwmd", password="TfByIA-n-mJFkp66NvoZWYCeMz", host="ec2-54-235-85-65.compute-1.amazonaws.com", port="5432")
-        cur = conn.cursor()
-        BOT_TABLE_NAME = os.environ.get("BOT_TABLE_NAME").strip()
-        if check_team_bot(team_id, cur) == True:
-            statement = "UPDATE %s SET bot_user_id='%s',bot_access_token='%s' WHERE team_id='%s'"%(BOT_TABLE_NAME,bot_user_id,bot_access_token, team_id)
-        else:
-            statement = "INSERT INTO %s (team_id,bot_user_id,bot_access_token) VALUES ('%s','%s','%s')"%(BOT_TABLE_NAME,team_id, bot_user_id,bot_access_token)
-        print statement
-        cur.execute(statement)
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        print "Unexpected error:", e.message
-        raise e
-
-def get_team_bot(team_id):
-    try:
-        conn = psycopg2.connect(database="d1gj7v4n22uqdg", user="fihlxuqpdlhwmd", password="TfByIA-n-mJFkp66NvoZWYCeMz", host="ec2-54-235-85-65.compute-1.amazonaws.com", port="5432")
-        cur = conn.cursor()
-        BOT_TABLE_NAME = os.environ.get("BOT_TABLE_NAME").strip()
-        statement = "SELECT bot_user_id,bot_access_token FROM %s WHERE team_id='%s'"%(BOT_TABLE_NAME,team_id)
-        print statement
-        cur.execute(statement)
-        row = cur.fetchone()
-        conn.close()
-        if row is not None:
-            return row[0], row[1]
-        else:
-            return None, None
-    except Exception as e:
-        print "Unexpected error:", e.message
-        return None, None
-
-def check_team_bot(team_id, cur):
-    BOT_TABLE_NAME = os.environ.get("BOT_TABLE_NAME").strip()
-    cur.execute("SELECT team_id FROM %s WHERE team_id = '%s'"%(BOT_TABLE_NAME,team_id))
-    return cur.fetchone() is not None
