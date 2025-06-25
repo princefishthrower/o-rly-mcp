@@ -4,6 +4,9 @@ ORLY MCP Server
 
 from mcp.server.fastmcp import FastMCP
 from mcp.types import TextContent
+from o_rly_book_generator.models import generate_image
+import tempfile
+import os
 
 # Initialize FastMCP server
 mcp = FastMCP("ORLY")
@@ -26,9 +29,15 @@ def run_orly_tool(prompt: str) -> TextContent:
         return TextContent(type="text", text="Error: Prompt cannot be empty.")
 
     # In a real scenario, this is where you would integrate with your ORLY tool's logic.
-    # For now, it just returns a dummy response.
-    dummy_response = f"ORLY has processed your prompt: '{prompt}'. This is a placeholder response."
-    return TextContent(type="text", text=dummy_response)
+    image_bytes = generate_image(prompt)
+
+    # Save the image to a temporary file
+    temp_dir = tempfile.gettempdir()
+    temp_file_path = os.path.join(temp_dir, "orly_image.png")
+    with open(temp_file_path, "wb") as f:
+        f.write(image_bytes)
+
+    return TextContent(type="text", text=f"Image saved to {temp_file_path}")
 
 def main():
     """Run the MCP server"""
