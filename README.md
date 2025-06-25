@@ -1,6 +1,6 @@
-# O-RLY-Book-Generator MCP Server
+# o-rly-mcp
 
-An MCP (Model Context Protocol) server for generating O'RLY? book covers that display directly in Claude Desktop.
+An MCP (Model Context Protocol) server for generating O'RLY? (O'Reilly parody) book covers that display directly in Claude Desktop application.
 
 ## Overview
 
@@ -13,7 +13,7 @@ This MCP server generates parody book covers in the style of O'Reilly books with
 ```bash
 # Clone the repository
 git clone [your-repo-url]
-cd O-RLY-Book-Generator
+cd o-rly-mcp
 
 # Create a virtual environment and install dependencies
 uv venv .venv
@@ -51,15 +51,15 @@ Add this MCP server to your Claude Desktop configuration file (`claude_desktop_c
         "--with", "fonttools",
         "--with", "requests",
         "python",
-        "/Users/chris/enterprise/O-RLY-Book-Generator/orly_mcp/server.py"
+        "/path/to/your/o-rly-mcp/orly_mcp/server.py"
       ],
-      "cwd": "/Users/chris/enterprise/O-RLY-Book-Generator"
+      "cwd": "/path/to/your/o-rly-mcp"
     }
   }
 }
 ```
 
-**Important:** Replace `/Users/chris/enterprise/O-RLY-Book-Generator` with your actual project path.
+**Important:** Replace `/path/to/your/o-rly-mcp` with your actual project path.
 
 ### Alternative: Package Installation
 
@@ -72,7 +72,7 @@ uv pip install -e .
   "mcpServers": {
     "orly-local": {
       "command": "uvx",
-      "args": ["--from", "/your/path/to/O-RLY-Book-Generator", "orly-mcp"]
+      "args": ["--from", "/your/path/to/o-rly-mcp", "orly-mcp"]
     }
   }
 }
@@ -85,7 +85,7 @@ uv pip install -e .
 If you see this error, the MCP dependencies aren't available:
 
 ```bash
-cd /path/to/your/O-RLY-Book-Generator
+cd /path/to/your/o-rly-mcp
 uv pip install -r requirements.txt
 ```
 
@@ -142,4 +142,4 @@ The original O'RLY book cover generation code in the `orly_generator/` directory
 
 ## Acknowledgments
 
-This project builds upon the excellent work by Charles Berlin. The core image generation code in the `orly_generator/` directory is adapted from his original [O-RLY-Book-Generator](https://github.com/charleshberlin/O-RLY-Book-Generator) repository, updated to work with Python 3 and integrated into an MCP server for Claude Desktop.
+This project builds upon the excellent work by Charles Berlin. The core image generation code in the `orly_generator/` directory is adapted from his original [o-rly-mcp](https://github.com/charleshberlin/o-rly-mcp) repository, updated to work with Python 3 and integrated into an MCP server for Claude Desktop.
