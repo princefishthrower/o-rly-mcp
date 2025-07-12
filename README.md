@@ -1,7 +1,8 @@
 # orly-mcp
 
+[![MCP Tool](https://img.shields.io/badge/MCP-Tool-yellow?labelColor=yellow)](https://modelcontextprotocol.io)
 [![PyPI version](https://img.shields.io/pypi/v/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
-[![Python versions](https://img.shields.io/pypi/## Publish
+[![Python versions](https://img.shields.io/pypi/pyversions/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
 
 ![Cooked myself with my own MCP tool :/](./demo.png)
 
