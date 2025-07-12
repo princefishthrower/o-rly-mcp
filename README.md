@@ -1,7 +1,7 @@
 # orly-mcp
 
 [![PyPI version](https://img.shields.io/pypi/v/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
-[![Python versions](https://img.shields.io/pypi/pyversions/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)
+[![Python versions](https://img.shields.io/pypi/## Publish
 
 ![Cooked myself with my own MCP tool :/](./demo.png)
 
@@ -154,4 +154,43 @@ The original O'RLY book cover generation code in the `orly_generator/` directory
 
 ## Acknowledgments
 
-This project builds upon the excellent work by Charles Berlin. The core image generation code in the `orly_generator/` directory is adapted from his original [orly-mcp](https://github.com/charleshberlin/orly-mcp) repository, updated to work with Python 3 and integrated into an MCP server for Claude Desktop.
+This project builds upon the excellent work by Charles Berlin. The core image generation code in the `orly_generator/` directory is adapted from his original [O-RLY-Book-Generator](https://github.com/charleshberlin/O-RLY-Book-Generator) repository, updated to work with Python 3 and integrated into an MCP tool for usage with MCP clients like Claude Desktop.
+
+## Publish
+
+(More for Chris, the Author, since he never uses Python and will forget this)
+
+You can quickly publish a new version using twine:
+
+```shell
+uv run twine upload dist/*
+````
+
+You'll be prompted to enter your PyPI API token.
+
+
+You can quickly publish a new version using twine:
+
+```shell
+# Install dev dependencies (includes build and twine)
+uv sync --group dev
+
+# Build the package
+uv run python -m build
+
+# Check the built package
+uv run twine check dist/*
+
+# Publish to TestPyPI first for testing (optional)
+uv run twine upload --repository testpypi dist/*
+
+# Publish to PyPI
+uv run twine upload dist/*
+```
+
+Make sure to:
+1. Update the version number in `pyproject.toml`
+2. Test the package locally with `uv run python test_comprehensive.py`
+3. Build and publish
+
+For authentication, you'll need PyPI API tokens configured in your `~/.pypirc` file or set as environment variables.ons/orly-mcp.svg)](https://pypi.org/project/orly-mcp/)

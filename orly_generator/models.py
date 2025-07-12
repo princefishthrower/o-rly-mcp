@@ -22,16 +22,16 @@ def get_text_size(draw, text, font, multiline=False):
         bbox = draw.textbbox((0, 0), text, font=font)
         return bbox[2] - bbox[0], bbox[3] - bbox[1]
 
-def generate_image(title, topText, author, image_code, theme, guide_text_placement='bottom_right', guide_text='The Definitive Guide'):
-    cache_string = title + "_" + topText + "_" + author + "_" + image_code + "_" + theme + "_" + guide_text_placement + "_" + guide_text
+def generate_image(title, topText, author, image_code, theme, guide_text_placement='bottom_right', guide_text='The Definitive Guide', scale=1.0):
+    cache_string = title + "_" + topText + "_" + author + "_" + image_code + "_" + theme + "_" + guide_text_placement + "_" + guide_text + "_" + str(scale)
 
     cached = get(cache_string)
     if cached:
         print("Cache hit")
         try:
             final_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), ('%s.png'%datetime.datetime.now())))
-            width = 500
-            height = 700
+            width = int(500 * scale)
+            height = int(700 * scale)
             im = Image.frombytes('RGBA', (width, height), cached)
             im.save(final_path)
             im.close()
@@ -62,8 +62,9 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
     }
     themeColor = themeColors[theme]
 
-    width = 500
-    height = 700
+    # Base dimensions: 500x700, scaled by the scale parameter
+    width = int(500 * scale)
+    height = int(700 * scale)
     im = Image.new('RGBA', (width, height), "white")
 
     font_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'fonts', 'Garamond Light.ttf'))
@@ -71,34 +72,35 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
     font_path_helv_bold = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'fonts', 'Helvetica Bold.ttf'))
     font_path_italic = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'fonts', 'Garamond LightItalic.ttf'))
 
-    topFont = ImageFont.truetype(font_path_italic, 20)
-    subtitleFont = ImageFont.truetype(font_path_italic, 34)
-    authorFont = ImageFont.truetype(font_path_italic, 24)
-    titleFont = ImageFont.truetype(font_path, 62)
-    oriellyFont = ImageFont.truetype(font_path_helv, 28)
-    questionMarkFont = ImageFont.truetype(font_path_helv_bold, 16)
+    # Font sizes scaled by the scale parameter
+    topFont = ImageFont.truetype(font_path_italic, int(20 * scale))
+    subtitleFont = ImageFont.truetype(font_path_italic, int(34 * scale))
+    authorFont = ImageFont.truetype(font_path_italic, int(24 * scale))
+    titleFont = ImageFont.truetype(font_path, int(62 * scale))
+    oriellyFont = ImageFont.truetype(font_path_helv, int(28 * scale))
+    questionMarkFont = ImageFont.truetype(font_path_helv_bold, int(16 * scale))
 
     dr = ImageDraw.Draw(im)
-    dr.rectangle(((20,0),(width-20,10)), fill=themeColor)
+    dr.rectangle(((int(20*scale),0),(width-int(20*scale),int(10*scale))), fill=themeColor)
 
     topText = sanitzie_unicode(topText, font_path_italic)
     textWidth, textHeight = get_text_size(dr, topText, topFont)
     textPositionX = (width/2) - (textWidth/2)
 
-    dr.text((textPositionX,10), topText, fill='black', font=topFont)
+    dr.text((textPositionX,int(10*scale)), topText, fill='black', font=topFont)
 
     author = sanitzie_unicode(author, font_path_italic)
     textWidth, textHeight = get_text_size(dr, author, authorFont)
-    textPositionX = width - textWidth - 20
-    textPositionY = height - textHeight - 20
+    textPositionX = width - textWidth - int(20*scale)
+    textPositionY = height - textHeight - int(20*scale)
 
     dr.text((textPositionX,textPositionY), author, fill='black', font=authorFont)
 
     oreillyText = "O RLY"
 
     textWidth, textHeight = get_text_size(dr, oreillyText, oriellyFont)
-    textPositionX = 20
-    textPositionY = height - textHeight - 20
+    textPositionX = int(20*scale)
+    textPositionY = height - textHeight - int(20*scale)
 
     dr.text((textPositionX,textPositionY), oreillyText, fill='black', font=oriellyFont)
 
@@ -108,40 +110,46 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
 
     dr.text((textPositionX,textPositionY-1), oreillyText, fill=themeColor, font=questionMarkFont)
 
-    titleFont, newTitle = clamp_title_text(sanitzie_unicode(title, font_path), width-80)
+    titleFont, newTitle = clamp_title_text(sanitzie_unicode(title, font_path), width-int(80*scale), scale)
     if newTitle == None:
         raise ValueError('Title too long')
 
     textWidth, textHeight = get_text_size(dr, newTitle, titleFont, multiline=True)
-    dr.rectangle([(20,400),(width-20,400 + textHeight + 40)], fill=themeColor)
+    title_box_y = int(400 * scale)
+    dr.rectangle([(int(20*scale),title_box_y),(width-int(20*scale),title_box_y + textHeight + int(40*scale))], fill=themeColor)
 
     subtitle = sanitzie_unicode(guide_text, font_path_italic)
 
     if guide_text_placement == 'top_left':
         textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
-        textPositionX = 20
-        textPositionY = 400 - textHeight - 2
+        textPositionX = int(20*scale)
+        textPositionY = title_box_y - textHeight - int(2*scale)
     elif guide_text_placement == 'top_right':
         textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
-        textPositionX = width - 20 - textWidth
-        textPositionY = 400 - textHeight - 2
+        textPositionX = width - int(20*scale) - textWidth
+        textPositionY = title_box_y - textHeight - int(2*scale)
     elif guide_text_placement == 'bottom_left':
-        textPositionY = 400 + textHeight + 40
+        textPositionY = title_box_y + textHeight + int(40*scale)
         textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
-        textPositionX = 20
+        textPositionX = int(20*scale)
     else:#bottom_right is default
-        textPositionY = 400 + textHeight + 40
+        textPositionY = title_box_y + textHeight + int(40*scale)
         textWidth, textHeight = get_text_size(dr, subtitle, subtitleFont)
-        textPositionX = width - 20 - textWidth
+        textPositionX = width - int(20*scale) - textWidth
 
     dr.text((textPositionX,textPositionY), subtitle, fill='black', font=subtitleFont)
 
-    dr.multiline_text((40,420), newTitle, fill='white', font=titleFont)
+    dr.multiline_text((int(40*scale),title_box_y + int(20*scale)), newTitle, fill='white', font=titleFont)
 
     cover_image_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'images', ('%s.png'%image_code)))
     coverImage = Image.open(cover_image_path).convert('RGBA')
+    
+    # Scale the animal image by the scale parameter
+    original_size = coverImage.size
+    scaled_size = (int(original_size[0] * scale), int(original_size[1] * scale))
+    coverImage = coverImage.resize(scaled_size, Image.LANCZOS)
 
-    offset = (80,40)
+    offset = (int(80*scale),int(40*scale))
     im.paste(coverImage, offset, coverImage)
 
     final_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), ('%s.png'%datetime.datetime.now())))
@@ -152,16 +160,16 @@ def generate_image(title, topText, author, image_code, theme, guide_text_placeme
 
     return final_path
 
-def clamp_title_text(title, width):
-    im = Image.new('RGBA', (500,500), "white")
+def clamp_title_text(title, width, scale=3.0):
+    im = Image.new('RGBA', (int(500*scale),int(500*scale)), "white")
     dr = ImageDraw.Draw(im)
 
     font_path_italic = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'fonts', 'Garamond Light.ttf'))
     #try and fit title on one line
     font = None
 
-    startFontSize = 80
-    endFontSize = 61
+    startFontSize = int(80 * scale)
+    endFontSize = int(61 * scale)
 
     for fontSize in range(startFontSize,endFontSize,-1):
         font = ImageFont.truetype(font_path_italic, fontSize)
@@ -171,8 +179,8 @@ def clamp_title_text(title, width):
             return font, title
 
     #try and fit title on two lines
-    startFontSize = 80
-    endFontSize = 34
+    startFontSize = int(80 * scale)
+    endFontSize = int(34 * scale)
 
     for fontSize in range(startFontSize,endFontSize,-1):
         font = ImageFont.truetype(font_path_italic, fontSize)

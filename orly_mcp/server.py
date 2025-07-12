@@ -30,6 +30,7 @@ mcp = FastMCP("ORLY")
         theme (str, optional): Color theme 0-16. Defaults to random.
         guide_text_placement (str, optional): Where to place "guide" text - 'top_left', 'top_right', 'bottom_left', 'bottom_right'. Defaults to 'bottom_right'.
         guide_text (str, optional): The guide text to display. Defaults to 'The Definitive Guide' As often as possible, try not to just use "The Definitive Guide" but something more creative.
+        scale (float, optional): Scale factor for image resolution. 1.0 = 500x700px, 2.0 = 1000x1400px, 3.0 = 1500x2100px (default). Higher values create larger, higher resolution images.
 
     Returns:
         Image: The generated O'RLY? book cover image that will be displayed in chat.
@@ -42,7 +43,8 @@ def generate_orly_cover(
     image_code: str = None, 
     theme: str = None,
     guide_text_placement: str = "bottom_right",
-    guide_text: str = "The Definitive Guide"
+    guide_text: str = "The Definitive Guide",
+    scale: float = 3.0
 ) -> Image:
     if not title.strip():
         raise ValueError("Title cannot be empty.")
@@ -87,6 +89,12 @@ def generate_orly_cover(
         if guide_text_placement not in valid_placements:
             raise ValueError(f"guide_text_placement must be one of {valid_placements}, got '{guide_text_placement}'")
         
+        # Validate scale
+        if scale <= 0:
+            raise ValueError(f"Scale must be greater than 0, got {scale}")
+        if scale > 10:
+            raise ValueError(f"Scale must be 10 or less to avoid excessive memory usage, got {scale}")
+        
         # Generate the image
         image_path = generate_image(
             title=title,
@@ -95,7 +103,8 @@ def generate_orly_cover(
             image_code=image_code,
             theme=theme,
             guide_text_placement=guide_text_placement,
-            guide_text=guide_text
+            guide_text=guide_text,
+            scale=scale
         )
         
         # Return the image using the Image helper class for direct display

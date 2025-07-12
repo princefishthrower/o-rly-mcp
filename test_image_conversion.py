@@ -17,13 +17,14 @@ def test_image_conversion():
     print("🧪 Testing ORLY MCP tool image conversion...")
     
     try:
-        # Generate a cover
+        # Generate a cover with lower scale (1.0 = 500x700px instead of 1500x2100px)
         image_result = generate_orly_cover(
-            title="MCP Integration",
-            subtitle="Testing Image Display",
-            author="MCP Developer",
-            image_code="25",  # Valid image code 1-40
-            theme="8"
+            title="Windows WPF",
+            author="Microsoft Corp",
+            subtitle="Super Future Technology!!!",
+            guide_text="The 'F' Stands for 'Forever'",
+            guide_text_placement="bottom_right",
+            scale=1.0  # Much smaller resolution for testing
         )
         
         print(f"✅ Generated Image object: {type(image_result)}")
